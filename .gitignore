@@ -6,7 +6,7 @@ obj/
 .vs/
 .vscode/
 .idea/
-
+Properties/
 # Windows Installer files
 *.cab
 *.msi

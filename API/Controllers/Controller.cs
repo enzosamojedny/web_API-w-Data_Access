@@ -29,7 +29,7 @@ namespace API.Controllers
 
                 if (createdUser == null)
                 {
-                    return BadRequest($"Could not create user{user.Nombre}.");
+                    return BadRequest($"Could not create user {user.Nombre}.");
                 }
 
                 return Ok(createdUser);

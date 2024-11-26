@@ -6,6 +6,7 @@
     public class Methods
     {
 
+        //agregar validaciones tipo CHECK Edad mayor a 14
         public readonly string _connectionString;
         public Methods(string connectionString)
         {
@@ -20,7 +21,10 @@
                     connection.Open();
 
                     using (MySqlCommand command = new MySqlCommand(
-                        "INSERT INTO usuarios (Nombre, Edad, Email) VALUES (@nombre, @edad, @email); SELECT LAST_INSERT_ID();",
+                        @"INSERT INTO usuarios (Nombre, Edad, Email)
+                        SELECT @nombre, @edad, @email
+                        WHERE @edad > 14; 
+                        SELECT LAST_INSERT_ID();",
                         connection))
                     {
                         command.Parameters.AddWithValue("@nombre", nombre);
