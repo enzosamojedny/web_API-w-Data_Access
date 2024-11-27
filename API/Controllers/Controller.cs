@@ -22,21 +22,21 @@ namespace API.Controllers
             {
                 if (user == null)
                 {
-                    return BadRequest("Invalid user data.");
+                    return StatusCode(StatusCodes.Status400BadRequest, "Invalid user data.");
                 }
 
                 var createdUser = _businessLayer.CreateUser(user);
 
                 if (createdUser == null)
                 {
-                    return BadRequest($"Could not create user {user.Nombre}.");
+                    return StatusCode(StatusCodes.Status400BadRequest, $"Could not create user {user.Nombre}.");
                 }
 
-                return Ok(createdUser);
+                return CreatedAtAction(nameof(GetUserById), new { id = createdUser.ID }, createdUser);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
             }
         }
 
@@ -50,14 +50,14 @@ namespace API.Controllers
 
                 if (users == null || users.Count == 0)
                 {
-                    return NotFound("No users found.");
+                    return StatusCode(StatusCodes.Status404NotFound, "No users found.");
                 }
 
-                return Ok(users);
+                return StatusCode(StatusCodes.Status200OK, users);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
             }
         }
 
@@ -71,40 +71,63 @@ namespace API.Controllers
 
                 if (user == null)
                 {
-                    return NotFound($"User with ID {id} not found.");
+                    return StatusCode(StatusCodes.Status404NotFound, $"User with ID {id} not found.");
                 }
 
-                return Ok(user);
+                return StatusCode(StatusCodes.Status200OK, user);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
             }
         }
+        // GET api/Users/Email
+        [HttpGet("email")]
+        public ActionResult<User> GetUserByEmail(string email)
+        {
+            try
+            {
+                var user = _businessLayer.GetUserByEmail(email);
 
-        // PUT api/Users
-        [HttpPut("{id}")]
+                if (user == null)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, $"User with Email {email} not found.");
+                }
+
+                return StatusCode(StatusCodes.Status200OK, user);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
+            }
+        }
+        // PATCH api/Users
+        [HttpPatch]
+
+        //lo ideal seria hacer DTO's para req, res
         public ActionResult<User> UpdateUser([FromBody] User user)
         {
             try
             {
-                if (user == null)
+                var validUser = _businessLayer.GetUserByID(user.ID.Value);
+
+                if (validUser == null)
                 {
-                    return BadRequest("Invalid user data.");
+                    return StatusCode(StatusCodes.Status400BadRequest, "Invalid user data.");
                 }
 
                 var updatedUser = _businessLayer.UpdateUser(user);
 
                 if (updatedUser == null)
                 {
-                    return BadRequest($"Could not update user with ID {user.ID}.");
+                    return StatusCode(StatusCodes.Status400BadRequest, $"Could not update user with ID {user.ID}.");
                 }
 
-                return Ok(updatedUser);
+                return StatusCode(StatusCodes.Status200OK, updatedUser);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
             }
         }
 
@@ -118,14 +141,14 @@ namespace API.Controllers
 
                 if (!result)
                 {
-                    return NotFound($"User with ID {id} could not be deleted.");
+                    return StatusCode(StatusCodes.Status404NotFound, $"User with ID {id} could not be deleted.");
                 }
 
-                return Ok($"User with ID {id} successfully soft deleted.");
+                return StatusCode(StatusCodes.Status200OK, $"User with ID {id} successfully soft deleted.");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
             }
         }
     }

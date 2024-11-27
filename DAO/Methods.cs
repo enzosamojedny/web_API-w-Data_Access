@@ -6,7 +6,6 @@
     public class Methods
     {
 
-        //agregar validaciones tipo CHECK Edad mayor a 14
         public readonly string _connectionString;
         public Methods(string connectionString)
         {
@@ -23,7 +22,7 @@
                     using (MySqlCommand command = new MySqlCommand(
                         @"INSERT INTO usuarios (Nombre, Edad, Email)
                         SELECT @nombre, @edad, @email
-                        WHERE @edad > 14; 
+                        WHERE @edad >= 14; 
                         SELECT LAST_INSERT_ID();",
                         connection))
                     {
@@ -62,7 +61,8 @@
                             {
                                 ID = Convert.ToInt32(reader["ID"]),
                                 Nombre = reader["Nombre"].ToString(),
-                                Edad = Convert.ToInt32(reader["Edad"])
+                                Edad = Convert.ToInt32(reader["Edad"]),
+                                Email = reader["Email"].ToString()
                             };
                             users.Add(user);
                         }
@@ -89,7 +89,8 @@
                         {
                             ID = Convert.ToInt32(reader["ID"]),
                             Nombre = reader["Nombre"].ToString(),
-                            Edad = Convert.ToInt32(reader["Edad"])
+                            Edad = Convert.ToInt32(reader["Edad"]),
+                            Email = reader["Email"].ToString(),
                         };
                     }
                 }
@@ -153,23 +154,17 @@
         }
         public User UpdateUser(User user)
         {
-
-            if (user == null)
-            {
-                Console.WriteLine("Email is invalid");
-                throw new Exception("User does not exist.");
-            }
-
             using (MySqlConnection connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
 
-                using (MySqlCommand updateCommand = new MySqlCommand("UPDATE usuarios SET Nombre = @nombre, Edad = @edad WHERE ID = @id AND DELETED = 0", connection))
+                using (MySqlCommand updateCommand = new MySqlCommand("UPDATE usuarios SET Nombre = @nombre, Edad = @edad, Email = @email, Deleted = @deleted WHERE ID = @id", connection))
                 {
-                    updateCommand.Parameters.AddWithValue("@nombre", user.Nombre);
-                    updateCommand.Parameters.AddWithValue("@edad", user.Edad);
                     updateCommand.Parameters.AddWithValue("@id", user.ID);
-
+                    updateCommand.Parameters.AddWithValue("@edad", user.Edad);
+                    updateCommand.Parameters.AddWithValue("@nombre", user.Nombre);
+                    updateCommand.Parameters.AddWithValue("@email", user.Email);
+                    updateCommand.Parameters.AddWithValue("@deleted", user.Deleted);
                     int rowsAffected = updateCommand.ExecuteNonQuery();
 
                     if (rowsAffected == 0)
