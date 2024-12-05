@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "Models\Models.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BLL", "BLL\BLL.csproj", "{56C7FFB0-DB4B-41D0-980C-1C87372468A1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository_Layer", "Repository\Repository_Layer.csproj", "{9DA113B2-E2D8-402F-BBE9-B2B3AC075603}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Validation_Layer", "Validation_Layer\Validation_Layer.csproj", "{EEA451DB-A303-4AD6-AF5F-763A14B2BB0A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{56C7FFB0-DB4B-41D0-980C-1C87372468A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56C7FFB0-DB4B-41D0-980C-1C87372468A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56C7FFB0-DB4B-41D0-980C-1C87372468A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DA113B2-E2D8-402F-BBE9-B2B3AC075603}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DA113B2-E2D8-402F-BBE9-B2B3AC075603}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DA113B2-E2D8-402F-BBE9-B2B3AC075603}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DA113B2-E2D8-402F-BBE9-B2B3AC075603}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEA451DB-A303-4AD6-AF5F-763A14B2BB0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEA451DB-A303-4AD6-AF5F-763A14B2BB0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEA451DB-A303-4AD6-AF5F-763A14B2BB0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEA451DB-A303-4AD6-AF5F-763A14B2BB0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

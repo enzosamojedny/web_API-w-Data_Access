@@ -1,4 +1,4 @@
-﻿namespace Models
+﻿namespace Models.Entities
 {
     public class User
     {
@@ -7,5 +7,6 @@
         public int Edad { get; set; }
         public string Email { get; set; }
         public bool? Deleted { get; set; } = false;
+        public string Password { get; set; }
     }
 }

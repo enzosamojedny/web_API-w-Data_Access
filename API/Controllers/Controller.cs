@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BLL;
-using Models;
+using Models.Entities;
+using Models.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
@@ -8,11 +10,31 @@ namespace API.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly BusinessLayer _businessLayer;
-
-        public UsersController()
+        private readonly IBusinessLayer _businessLayer;
+        private readonly Login _login;
+        public UsersController(IBusinessLayer businessLayer, Login login)
         {
-            _businessLayer = new BusinessLayer();
+            _businessLayer = businessLayer;
+            _login = login;
+        }
+        [HttpPost]
+        [Route("Login")]
+        public ActionResult<LoginDto> Login(LoginDto login)
+        {
+            var usuarioEncontrado =  _businessLayer.GetUserByEmail(login.Email);
+
+            var encryptedPassword = _login.EncryptSHA256(login.Password);
+
+            if (usuarioEncontrado == null)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, new { isSuccess = false, token = "" });
+            }
+            if (usuarioEncontrado.Password == encryptedPassword)
+            {
+                return StatusCode(StatusCodes.Status200OK, new { isSuccess = true, token = _login.GenerateJWT(usuarioEncontrado) });
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+
         }
 
         [HttpPost]
@@ -25,7 +47,17 @@ namespace API.Controllers
                     return StatusCode(StatusCodes.Status400BadRequest, "Invalid user data.");
                 }
 
-                var createdUser = _businessLayer.CreateUser(user);
+                var newUser = new User
+                {
+                    ID = user.ID,
+                    Nombre = user.Nombre,
+                    Edad = user.Edad,
+                    Email = user.Email,
+                    Deleted = user.Deleted,
+                    Password = _login.EncryptSHA256(user.Password)
+
+                };
+                var createdUser = _businessLayer.CreateUser(newUser);
 
                 if (createdUser == null)
                 {
@@ -41,6 +73,7 @@ namespace API.Controllers
         }
 
         // GET: api/Users
+        [Authorize]
         [HttpGet]
         public ActionResult<List<User>> GetAllUsers()
         {
@@ -60,7 +93,7 @@ namespace API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
             }
         }
-
+        [Authorize]
         // GET api/Users/5
         [HttpGet("{id}")]
         public ActionResult<User> GetUserById(int id)
@@ -81,6 +114,7 @@ namespace API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
             }
         }
+        [Authorize]
         // GET api/Users/Email
         [HttpGet("email")]
         public ActionResult<User> GetUserByEmail(string email)
@@ -102,6 +136,7 @@ namespace API.Controllers
             }
         }
         // PATCH api/Users
+        [Authorize]
         [HttpPatch]
 
         //lo ideal seria hacer DTO's para req, res
@@ -130,7 +165,7 @@ namespace API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
             }
         }
-
+        [Authorize]
         // DELETE api/Users/5
         [HttpDelete("{id}")]
         public ActionResult DeleteUser(int id)

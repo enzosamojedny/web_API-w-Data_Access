@@ -1,17 +1,22 @@
-﻿namespace BLL
-{
+﻿    using Helpers;
+    using Models.Entities;
     using DAO;
-    using Models;
-    using Helpers;
-    public class BusinessLayer
-    {
-        private readonly Methods _methods;
-        private readonly string _connectionString = "Server=localhost;Port=3306;Database=extradosdb;User ID=root;Password=123456;";
+    using Microsoft.Extensions.Logging;
+using Models.DTOs;
+using Repository_Layer;
 
-        public BusinessLayer()
+namespace BLL
+{
+    public class BusinessLayer : IBusinessLayer
+    {
+        private readonly IUserRepository _methods;
+        //private readonly string _connectionString = "Server=localhost;Port=3306;Database=extradosdb;User ID=root;Password=123456;";
+
+        public BusinessLayer(IUserRepository methods)
         {
-            _methods = new Methods(_connectionString);
+            _methods = methods;
         }
+
         public User CreateUser(User user)
         {
             UserValidator.ValidateEmail(user.Email);
@@ -22,14 +27,15 @@
             {
                 throw new Exception("An user with this email already exists.");
             }
-            return _methods.CreateUser(user.Nombre, user.Edad, user.Email);
+
+            return _methods.CreateUser(user);
         }
-        public List<User> GetAllUsers() => _methods.GetAllUsers();
+        public List<UserDto> GetAllUsers() => _methods.GetAllUsers();
         public User GetUserByID(int id)
         {
             return _methods.GetUserByID(id);
         }
-        public User GetUserByEmail(string email)
+        public UserDto GetUserByEmail(string email)
         {
             //guard clauses
             UserValidator.ValidateEmail(email);
