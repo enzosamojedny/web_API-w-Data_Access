@@ -17,7 +17,7 @@ namespace Repository
             _dataAccess = dataAccess;
         }
         public UserRepository(ILogger logger)
-            : this(new DataAccess("Server=localhost;Port=3306;Database=extradosdb;User ID=test;Password=123456;", logger))
+            : this(new DataAccess("Server=localhost;Port=3306;Database=extradosdb;User ID=root;Password=123456;", logger))
         { }
 
 

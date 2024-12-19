@@ -1,18 +1,15 @@
-﻿    using Helpers;
+﻿using DAO;
+using Helpers;
     using Models.Entities;
-    using DAO;
-    using Microsoft.Extensions.Logging;
-using Models.DTOs;
-using Repository_Layer;
+using System.Text.RegularExpressions;
 
 namespace BLL
 {
     public class BusinessLayer : IBusinessLayer
     {
-        private readonly IUserRepository _methods;
-        //private readonly string _connectionString = "Server=localhost;Port=3306;Database=extradosdb;User ID=root;Password=123456;";
+        private readonly IDataAccess _methods;
 
-        public BusinessLayer(IUserRepository methods)
+        public BusinessLayer(IDataAccess methods)
         {
             _methods = methods;
         }
@@ -22,7 +19,7 @@ namespace BLL
             UserValidator.ValidateEmail(user.Email);
             UserValidator.ValidateAge(user.Edad);
 
-            var existingUser = GetUserByEmail(user.Email);
+            var existingUser = GetUser(null,user.Email);
             if (existingUser != null)
             {
                 throw new Exception("An user with this email already exists.");
@@ -30,18 +27,24 @@ namespace BLL
 
             return _methods.CreateUser(user);
         }
-        public List<UserDto> GetAllUsers() => _methods.GetAllUsers();
+        public List<User> GetAllUsers() => _methods.GetAllUsers();
+
+        public User GetUser(int? id = null, string? email = null, int? age = null, string? dni = null)
+        {
+            UserValidator.ValidateEmail(email);
+            UserValidator.ValidateAge(age);
+            UserValidator.ValidateDNI(dni);
+
+            int validatedDNI = int.Parse(dni);
+
+            return _methods.GetUser(id, email, age, validatedDNI);
+        }
+
         public User GetUserByID(int id)
         {
-            return _methods.GetUserByID(id);
+            return _methods.GetUser(id);
         }
-        public UserDto GetUserByEmail(string email)
-        {
-            //guard clauses
-            UserValidator.ValidateEmail(email);
 
-            return _methods.GetUserByEmail(email);
-        }
         public bool SoftDeleteUser(int userID)
         {
             return _methods.SoftDeleteUser(userID);

@@ -1,4 +1,4 @@
-namespace Models.DTOs
+namespace API.Controllers.DTOs.Request
 {
     public class UserDto
     {

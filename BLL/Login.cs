@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using Models.DTOs;
+using Models.Entities;
 
 namespace BLL
 {
@@ -32,7 +32,7 @@ namespace BLL
             }
         }
 
-        public string GenerateJWT(UserDto usuario)
+        public string GenerateJWT(User usuario)
         {
             var jwtKey = _configuration["JWT:SecretKey"];
             if (string.IsNullOrEmpty(jwtKey))

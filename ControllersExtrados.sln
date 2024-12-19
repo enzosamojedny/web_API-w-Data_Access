@@ -3,17 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35506.116
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{107C55CE-6FBF-4218-8708-5042B4290365}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "API\API.csproj", "{107C55CE-6FBF-4218-8708-5042B4290365}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAO", "DAO\DAO.csproj", "{F30E0843-817A-4D31-89A0-2806022ADFD2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DAO", "DAO\DAO.csproj", "{F30E0843-817A-4D31-89A0-2806022ADFD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "Models\Models.csproj", "{0BA1323D-C2B0-4135-ACE2-D6EE824C02DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "Models\Models.csproj", "{0BA1323D-C2B0-4135-ACE2-D6EE824C02DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BLL", "BLL\BLL.csproj", "{56C7FFB0-DB4B-41D0-980C-1C87372468A1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository_Layer", "Repository\Repository_Layer.csproj", "{9DA113B2-E2D8-402F-BBE9-B2B3AC075603}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Validation_Layer", "Validation_Layer\Validation_Layer.csproj", "{EEA451DB-A303-4AD6-AF5F-763A14B2BB0A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BLL", "BLL\BLL.csproj", "{56C7FFB0-DB4B-41D0-980C-1C87372468A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,16 +33,11 @@ Global
 		{56C7FFB0-DB4B-41D0-980C-1C87372468A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56C7FFB0-DB4B-41D0-980C-1C87372468A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56C7FFB0-DB4B-41D0-980C-1C87372468A1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9DA113B2-E2D8-402F-BBE9-B2B3AC075603}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9DA113B2-E2D8-402F-BBE9-B2B3AC075603}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9DA113B2-E2D8-402F-BBE9-B2B3AC075603}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9DA113B2-E2D8-402F-BBE9-B2B3AC075603}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EEA451DB-A303-4AD6-AF5F-763A14B2BB0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EEA451DB-A303-4AD6-AF5F-763A14B2BB0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EEA451DB-A303-4AD6-AF5F-763A14B2BB0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EEA451DB-A303-4AD6-AF5F-763A14B2BB0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {94CE5E47-54F6-4DF6-B888-F0451975B194}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,44 @@
+﻿0-
+generar una API WEB REST de ASP.NET CORE que pueda guardar, obtener o actualizar usuarios.
+
+la API debe de poder buscar un usuario por email.									----DONE
+cada usuario tiene un mail,un nombre, edad.											----DONE
+los usuarios se deben guardar en una base de datos.									----DONE
+la API debe controlar que la edad > 14,												----DONE
+la API debe controlar que el email sea de GMAIL (usar string.Contains())			----DONE
+los DAO deben ser todos singletons y deben estar en su propia biblioteca de clases. ----????
+
+1-
+-modificar el ejercicio de la clase anterior, para que al guardar un usuario, 						----DONE
+la contraseña del mismo quede hasheada en la base de datos.
+-para esto, buscar una librería para hashear la contraseña											----DONE
+-asegurarse que la librería hashee la contraseña de acuerdo con las recomendaciones de la OWASP		----DONE
+-al llamar al endpoint de obtener usuario, 															----DONE
+se debe pedir la contraseña y se debe verificar que esta sea correcta
+
+
+2- 
+crear una API con siguientes endpoints:
+
+-registro de usuario, que guarde el usuario con la contraseña hasheada,								----DONE
+-login de usuario, que valida pass y contraseña y 
+devuelve un token JWT junto con la informaicon del usuario (en un objeto)							----DONE
+-endpoint para obtener la informacion de un usuario cualquiera, obtenido por atributo,				----????
+este endpoint solo debe poder ser llamado por un usuario logueado.
+
+3-
+-> agregar al ejercicio de la clase pasada:
+
+-un endpoint para que un usuario pueda pedir un libro												----????
+-se debe ingresar a este endpoint una hora/fecha en la que se le da al usuario el libro,			----????
+un nombre del libro y un id del usuario al que se le esta prestando el libro						----????
+-el endpoint debe dar una fecha de vencimiento del alquiler del libro,								----????
+que sera 5 días después de la fecha de préstamo
+-el endpoint debe recibir un token de usuario con un id												----????
+-el endpoint debe revisar que el usuario que esta pidiendo el libro,								----????
+y el usuario al que se esta dando el préstamo sean el mismo
+-el endpoint solo debe poder ser accedido por el rol “usuario”										----????
+-modificar la creación del jwt para que obtenga los datos desde configuración						----????
+(tanto en el program.cs como en el controlador)
+-modificar la conexión a la bd para que obtenga el connectionstring desde configuración				----????
+-aplicar inyección de dependencias al obtener el DAO												----????

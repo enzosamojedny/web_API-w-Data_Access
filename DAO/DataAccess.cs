@@ -2,7 +2,7 @@
 using MySqlConnector;
 using Microsoft.Extensions.Logging;
 using Models.Entities;
-using Models.DTOs;
+using System.Text;
 
 namespace DAO
 {
@@ -29,10 +29,10 @@ namespace DAO
                     try
                     {
                         string insertQuery = @"
-                    INSERT INTO usuarios (Nombre, Edad, Email, Password)
-                    SELECT @Nombre, @Edad, @Email, @Password
-                    WHERE @Edad >= 14;
-                    SELECT LAST_INSERT_ID();";
+                        INSERT INTO usuarios (Nombre, Edad, Email, Password)
+                        SELECT @Nombre, @Edad, @Email, @Password
+                        WHERE @Edad >= 14;
+                        SELECT LAST_INSERT_ID();";
 
                         int newUserId = connection.ExecuteScalar<int>(
                             insertQuery,
@@ -40,78 +40,55 @@ namespace DAO
                             transaction
                         );
 
-                        transaction.Commit(); // Commit the transaction
+                        transaction.Commit(); // Commit
 
-                        //return GetUserByID(newUserId, connection, transaction); // Use overloaded GetUserByID
-                        return GetUserByID(newUserId);
+                       
+                        return GetUser(newUserId);
                     }
                     catch (MySqlException ex)
                     {
                         Console.WriteLine($"Database error: {ex.Message}");
-                        transaction.Rollback(); // Rollback on failure
+                        transaction.Rollback(); // Rollback
                         throw;
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Unexpected error: {ex.Message}");
-                        transaction.Rollback(); // Rollback on unknown error
+                        transaction.Rollback(); // Rollback unknown error
                         throw;
                     }
                 }
             }
         }
 
-        public List<UserDto> GetAllUsers()
+        public List<User> GetAllUsers()
         {
             using (MySqlConnection connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
 
-                return connection.Query<UserDto>("SELECT * FROM Usuarios WHERE Deleted = 0").ToList();
+                return connection.Query<User>("SELECT * FROM Usuarios WHERE Deleted = 0").ToList();
             }
         }
 
-        //porque estoy enviando todo esto por parametros???
-        //public User GetUserByID(int id, MySqlConnection connection = null, IDbTransaction transaction = null)
-        //{
-        //    bool closeConnection = connection == null;
-        //    connection ??= new MySqlConnection(_connectionString);
-
-        //    if (closeConnection)
-        //        connection.Open();
-
-        //    try
-        //    {
-        //        string query = "SELECT ID, Nombre, Edad, Email FROM usuarios WHERE ID = @ID AND Deleted = 0";
-        //        return connection.QuerySingleOrDefault<User>(query, new { ID = id }, transaction);
-        //    }
-        //    finally
-        //    {
-        //        if (closeConnection)
-        //            connection.Close();
-        //    }
-        //}
-        public User GetUserByID(int id)
+        public User GetUser(int? id = null, string email = null, int? edad = null, int? dni = null)
         {
-            using (var connection = new MySqlConnection(_connectionString))
-            {
-                connection.Open();
-                return connection.QuerySingleOrDefault<User>(
-                    "SELECT ID, Nombre, Edad, Email FROM usuarios WHERE ID = @Id AND Deleted = 0",
-                    new { Id = id }
-                );
-            }
-        }
-        public UserDto GetUserByEmail(string email)
-        {
-            using (MySqlConnection connection = new MySqlConnection(_connectionString))
-            {
-                connection.Open();
-                return connection.QuerySingleOrDefault<UserDto>(
-                    "SELECT ID, Nombre, Edad, Email FROM usuarios WHERE Email = @email AND Deleted = 0",
-                    new { email }
-                );
-            }
+            using var connection = new MySqlConnection(_connectionString);
+            connection.Open();
+
+            var query = "SELECT ID, Nombre, Edad, Email FROM usuarios WHERE Deleted = 0";
+            var where = new List<string>();
+            var parameters = new { Id = id, Email = email, Edad = edad, DNI = dni };
+
+            if (id.HasValue) where.Add("ID = @Id");
+            if (!string.IsNullOrEmpty(email)) where.Add("Email = @Email");
+            if (edad.HasValue) where.Add("Edad = @Edad");
+            if (dni.HasValue) where.Add("DNI = @DNI");
+
+            if (where.Any())
+                query += " AND " + string.Join(" AND ", where);
+
+            return connection.QuerySingleOrDefault<User>(query, parameters);
         }
 
         public bool SoftDeleteUser(int userID)
@@ -160,8 +137,8 @@ namespace DAO
                         // Update user
                         int rowsAffected = connection.Execute(
                             @"UPDATE usuarios 
-                    SET Nombre = @Nombre, Edad = @Edad, Email = @Email, Deleted = @Deleted 
-                    WHERE ID = @ID",
+                            SET Nombre = @Nombre, Edad = @Edad, Email = @Email, Deleted = @Deleted 
+                            WHERE ID = @ID",
                             user,
                             transaction
                         );
@@ -190,7 +167,6 @@ namespace DAO
                 }
             }
         }
-
 
     }
 }
