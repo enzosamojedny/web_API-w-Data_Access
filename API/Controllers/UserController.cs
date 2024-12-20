@@ -3,20 +3,24 @@ using BLL;
 using Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using API.Controllers.DTOs.Request;
+using Microsoft.Extensions.Logging;
 
 namespace API.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
     {
         private readonly IBusinessLayer _businessLayer;
         private readonly Login _login;
+        private readonly ILogger<UsersController> _logger;
 
-        public UsersController(IBusinessLayer businessLayer, Login login)
+        public UsersController(IBusinessLayer businessLayer, Login login, ILogger<UsersController> logger)
         {
             _businessLayer = businessLayer;
             _login = login;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -143,9 +147,15 @@ namespace API.Controllers
             }
         }
         [Authorize]
-        [HttpGet]
+        [HttpGet("search")]
         public ActionResult<UserDto> GetUser(int? id = null, string? email = null, int? age = null, string? dni = null)
         {
+            if (id == null && string.IsNullOrEmpty(email) &&
+            age == null && string.IsNullOrEmpty(dni))
+            {
+                return BadRequest("At least one search parameter is required.");
+            }
+
             try
             {
                 var user = _businessLayer.GetUser(id, email, age, dni);
@@ -160,43 +170,41 @@ namespace API.Controllers
                     ID = user.ID,
                     Nombre = user.Nombre,
                     Edad = user.Edad,
-                    Email = user.Email,
-                    Deleted = user.Deleted
+                    Email = user.Email
                 };
+
                 return Ok(userDto);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
+                return StatusCode(
+                StatusCodes.Status500InternalServerError,
+                "An error occurred while processing your request.");
             }
         }
+
         [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login(LoginDto login)
         {
-            var validUser = _businessLayer.GetUser(null,login.Email);
-
-            if(validUser.Email == null || validUser.Password == null)
+            if (string.IsNullOrEmpty(login.Email) || string.IsNullOrEmpty(login.Password))
             {
-                return StatusCode(StatusCodes.Status400BadRequest, new { isSuccess = false, token = "" });
+                return BadRequest(new { isSuccess = false, token = "" });
+            }
+            var validUser =  _businessLayer.GetUser(null,login.Email);
+
+            if (validUser == null || validUser.Email == null || validUser.Password == null)
+            {
+                return BadRequest(new { isSuccess = false, token = "" });
+            }
+            if (validUser.Password != login.Password)
+            {
+                return BadRequest(new { isSuccess = false, token = "" });
             }
 
-            var user = new User
-            {
-                Email = login.Email,
-                Password = login.Password
-            };
-            var usuarioEncontrado = await _businessLayer.GetUser(login.Email && _login.GenerateJWT(login.Password));
+            var token = _login.GenerateJWT(validUser);
 
-            if (usuarioEncontrado == null)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, new { isSuccess = false, token = "" });
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status200OK, new { isSuccess = true, token = _login.GetHashCode(usuarioEncontrado) });
-            }
-
+            return Ok(new { isSuccess = true, token });
         }
     }
 }
