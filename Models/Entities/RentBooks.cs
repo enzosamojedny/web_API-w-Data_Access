@@ -1,10 +1,11 @@
-﻿namespace API.Controllers.DTOs.Response
+﻿namespace Models.Entities
 {
-    public class BookLoanResponseDto
+    public class RentBooks
     {
+        public int UserId { get; set; }
         public int BookId { get; set; }
         public DateTime FechaPrestamo { get; set; }
         public DateTime FechaVencimiento { get; set; }
-        public int UserId { get; set; }
+        public string Status { get; set; } = "Disponible";
     }
 }

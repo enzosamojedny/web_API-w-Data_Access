@@ -10,6 +10,18 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
+
+var jwtKey = builder.Configuration["Jwt:Key"];
+var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+var jwtAudience = builder.Configuration["Jwt:Audience"];
+
+if (string.IsNullOrEmpty(jwtKey))
+    throw new ArgumentNullException(nameof(jwtKey), "JWT Key is not configured");
+if (string.IsNullOrEmpty(jwtIssuer))
+    throw new ArgumentNullException(nameof(jwtIssuer), "JWT Issuer is not configured");
+if (string.IsNullOrEmpty(jwtAudience))
+    throw new ArgumentNullException(nameof(jwtAudience), "JWT Audience is not configured");
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -23,10 +35,10 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidIssuer = builder.Configuration[jwtIssuer],
+        ValidAudience = builder.Configuration[jwtAudience],
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+            Encoding.UTF8.GetBytes(jwtKey)),
         ClockSkew = TimeSpan.Zero
     };
 });
@@ -35,6 +47,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -68,6 +81,7 @@ builder.Services.AddScoped<IDataAccess>(provider =>
         provider.GetRequiredService<ILogger<DataAccess>>()
     )
 );
+
 builder.Services.AddScoped<Login>();
 builder.Services.AddScoped<IBusinessLayer, BusinessLayer>();
 

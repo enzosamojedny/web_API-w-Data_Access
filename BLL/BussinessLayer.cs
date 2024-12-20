@@ -18,6 +18,7 @@ namespace BLL
         {
             UserValidator.ValidateEmail(user.Email);
             UserValidator.ValidateAge(user.Edad);
+            UserValidator.ValidateDNI(user.DNI.ToString());
 
             var existingUser = GetUser(null,user.Email);
             if (existingUser != null)

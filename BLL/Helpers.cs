@@ -19,6 +19,11 @@ namespace Helpers
         }
         public static void ValidateDNI(string? dni)
         {
+            if (string.IsNullOrEmpty(dni))
+            {
+                throw new ArgumentNullException(nameof(dni), "DNI cannot be null or empty");
+            }
+
             if (dni.Length < 6 || dni.Length > 9)
             {
                 throw new ArgumentException($"DNI is incorrect");

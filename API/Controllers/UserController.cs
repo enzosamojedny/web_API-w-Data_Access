@@ -39,6 +39,7 @@ namespace API.Controllers
                     Nombre = userDto.Nombre,
                     Edad = userDto.Edad,
                     Email = userDto.Email,
+                    DNI = userDto.DNI,
                     Deleted = userDto.Deleted ?? false,
                     Password = _login.EncryptSHA256(userDto.Password)
                 };
@@ -57,6 +58,7 @@ namespace API.Controllers
                     Nombre = createdUser.Nombre,
                     Edad = createdUser.Edad,
                     Email = createdUser.Email,
+                    DNI = createdUser.DNI,
                     Deleted = createdUser.Deleted
                 };
 
@@ -88,6 +90,7 @@ namespace API.Controllers
                     Nombre = userDto.Nombre,
                     Edad = userDto.Edad,
                     Email = userDto.Email,
+                    DNI = userDto.DNI,
                     Deleted = userDto.Deleted ?? validUser.Deleted,
                     Password = validUser.Password
                 };
@@ -106,6 +109,7 @@ namespace API.Controllers
                     Nombre = updatedUser.Nombre,
                     Edad = updatedUser.Edad,
                     Email = updatedUser.Email,
+                    DNI = updatedUser.DNI,
                     Deleted = updatedUser.Deleted
                 };
 
@@ -170,7 +174,8 @@ namespace API.Controllers
                     ID = user.ID,
                     Nombre = user.Nombre,
                     Edad = user.Edad,
-                    Email = user.Email
+                    Email = user.Email,
+                    DNI = user.DNI
                 };
 
                 return Ok(userDto);
