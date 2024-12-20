@@ -30,15 +30,16 @@ namespace BLL
         }
         public List<User> GetAllUsers() => _methods.GetAllUsers();
 
-        public User GetUser(int? id = null, string? email = null, int? age = null, string? dni = null)
+        public User GetUser(int? id = null, string? email = null, int? age = null, int? dni = null)
         {
             UserValidator.ValidateEmail(email);
             UserValidator.ValidateAge(age);
-            UserValidator.ValidateDNI(dni);
 
-            int validatedDNI = int.Parse(dni);
-
-            return _methods.GetUser(id, email, age, validatedDNI);
+            if (dni.HasValue)
+            {
+                UserValidator.ValidateDNI(dni.Value.ToString());
+            }
+            return _methods.GetUser(id, email, age, dni);
         }
 
         public User GetUserByID(int id)

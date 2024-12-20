@@ -4,6 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using API.Controllers.DTOs.Request;
+using Microsoft.OpenApi.Any;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +49,18 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    c.MapType<UserDto>(() => new OpenApiSchema
+    {
+        Type = "object",
+        Example = new OpenApiObject
+        {
+            ["nombre"] = new OpenApiString("John Doe"),
+            ["edad"] = new OpenApiInteger(30),
+            ["email"] = new OpenApiString("john@example.com"),
+            ["dni"] = new OpenApiInteger(38112194),
+            ["password"] = new OpenApiString("yourPassword123")
+        }
+    });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {

@@ -7,7 +7,7 @@ namespace BLL
         User CreateUser(User user);
         List<User> GetAllUsers();
         User UpdateUser(User user);
-        User GetUser(int? id = null, string email = null, int? edad = null, string? dni = null);
+        User GetUser(int? id = null, string email = null, int? edad = null, int? dni = null);
         bool SoftDeleteUser(int userID);
     }
 }

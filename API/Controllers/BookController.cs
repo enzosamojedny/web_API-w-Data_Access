@@ -66,7 +66,7 @@ namespace API.Controllers
 
         [Authorize]
         [HttpGet]
-        public ActionResult<UserDto> GetUser(int? id = null, string? email = null, int? age = null, string? dni = null)
+        public ActionResult<UserDto> GetUser(int? id = null, string? email = null, int? age = null, int? dni = null)
         {
             try
             {
@@ -83,6 +83,7 @@ namespace API.Controllers
                     Nombre = user.Nombre,
                     Edad = user.Edad,
                     Email = user.Email,
+                    DNI = user.DNI,
                     Deleted = user.Deleted
                 };
                 return Ok(userDto);

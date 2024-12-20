@@ -15,7 +15,7 @@ namespace DAO
             
         public DataAccess(string connectionString, ILogger logger)
         {
-            _connectionString = "Server=localhost;Port=3306;Database=extradosdb;User ID=test;Password=123456;";
+            _connectionString = connectionString;
             _logger = logger;
         }
         public User CreateUser(User user)
@@ -48,13 +48,13 @@ namespace DAO
                     catch (MySqlException ex)
                     {
                         Console.WriteLine($"Database error: {ex.Message}");
-                        transaction.Rollback(); // Rollback
+                        transaction.Rollback();
                         throw;
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Unexpected error: {ex.Message}");
-                        transaction.Rollback(); // Rollback unknown error
+                        transaction.Rollback(); // rollback unknown error
                         throw;
                     }
                 }

@@ -152,13 +152,8 @@ namespace API.Controllers
         }
         [Authorize]
         [HttpGet("search")]
-        public ActionResult<UserDto> GetUser(int? id = null, string? email = null, int? age = null, string? dni = null)
+        public ActionResult<UserDto> GetUser(int? id = null, string? email = null, int? age = null, int? dni = null)
         {
-            if (id == null && string.IsNullOrEmpty(email) &&
-            age == null && string.IsNullOrEmpty(dni))
-            {
-                return BadRequest("At least one search parameter is required.");
-            }
 
             try
             {

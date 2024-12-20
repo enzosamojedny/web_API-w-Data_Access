@@ -26,7 +26,7 @@ namespace Helpers
 
             if (dni.Length < 6 || dni.Length > 9)
             {
-                throw new ArgumentException($"DNI is incorrect");
+                throw new ArgumentException($"DNI length is incorrect");
             }
             
             if (Regex.IsMatch(dni, @"[^0-9]"))
