@@ -28,7 +28,7 @@ namespace BLL
 
             return await _methods.CreateUser(user);
         }
-        public List<User> GetAllUsers() => _methods.GetAllUsers();
+        public async Task<List<User>> GetAllUsers() => await _methods.GetAllUsers();
 
         public async Task<User> GetUser(int? id = null, string? email = null, int? age = null, int? dni = null)
         {

@@ -119,11 +119,11 @@ namespace API.Controllers
 
         [Authorize]
         [HttpGet]
-        public ActionResult<List<UserDto>> GetAllUsers() //revisar
+        public async Task<ActionResult<List<UserDto>>> GetAllUsers()
         {
             try
             {
-                var users = _businessLayer.GetAllUsers();
+                var users = await _businessLayer.GetAllUsers();
 
                 if (users == null || users.Count == 0)
                 {
@@ -136,8 +136,11 @@ namespace API.Controllers
                     Nombre = user.Nombre,
                     Edad = user.Edad,
                     Email = user.Email,
-                    Deleted = user.Deleted
+                    DNI = user.DNI,
+                    Deleted = user.Deleted,
+                    Rol = user.Rol
                 }).ToList();
+
 
                 return StatusCode(StatusCodes.Status200OK, userDtos);
             }
@@ -150,7 +153,6 @@ namespace API.Controllers
         [HttpGet("search")]
         public async Task<ActionResult<UserDto>> GetUser(int? id = null, string? email = null, int? age = null, int? dni = null)
         {
-
             try
             {
                 var user = await _businessLayer.GetUser(id, email, age, dni);

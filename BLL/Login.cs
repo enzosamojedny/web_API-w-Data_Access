@@ -34,10 +34,12 @@ namespace BLL
 
         public string GenerateJWT(User usuario)
         {
-            var jwtKey = _configuration["JWT:SecretKey"];
+            var jwtKey = _configuration["JWT:Key"];
+            var jwtIssuer = _configuration["JWT:Issuer"];
+            var jwtAudience = _configuration["JWT:Audience"];
             if (string.IsNullOrEmpty(jwtKey))
             {
-                throw new ArgumentNullException("JWT:SecretKey", "JWT Secret Key is not configured.");
+                throw new ArgumentNullException("JWT:Key", "JWT Secret Key is not configured.");
             }
 
             var userClaims = new[]
@@ -50,11 +52,12 @@ namespace BLL
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
 
             var jwtConfig = new JwtSecurityToken(
-                claims: userClaims,
+                 issuer: jwtIssuer,
+                 audience: jwtAudience,
+                 claims: userClaims,
                 expires: DateTime.UtcNow.AddMinutes(30),
                 signingCredentials: credentials
             );
-
             return new JwtSecurityTokenHandler().WriteToken(jwtConfig);
         }
     }

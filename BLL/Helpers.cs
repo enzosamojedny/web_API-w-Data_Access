@@ -6,9 +6,9 @@ namespace Helpers
     {
         public static void ValidateEmail(string? email)
         {
+            if (email == null) throw new ArgumentNullException("Must provide an email address");
             if (!Regex.IsMatch(email, @"^[a-zA-Z0-9._%+-]+@gmail\.com$", RegexOptions.IgnoreCase))
                 throw new ArgumentException("Email must be a valid Gmail address");
-
         }
         public static void ValidateAge(int? age, int minimumAge = 14)
         {

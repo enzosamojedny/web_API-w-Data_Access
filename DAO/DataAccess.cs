@@ -67,13 +67,30 @@ namespace DAO
             }
         }
 
-        public List<User> GetAllUsers()
+        public async Task<List<User>> GetAllUsers()
         {
             using (MySqlConnection connection = new MySqlConnection(_connectionString))
             {
                 connection.Open();
 
-                return connection.Query<User>("SELECT * FROM Users WHERE Deleted = 0").ToList();
+                //return connection.Query<User>("SELECT * FROM Users WHERE Deleted = 0").ToList();
+
+            const string query = @"
+            SELECT 
+                ID,
+                Nombre,
+                Edad,
+                Email,
+                DNI,
+                Deleted,
+                Rol,
+                Password
+            FROM Users 
+            WHERE Deleted = 0";
+
+            //solucionar problema con mapping de string a enum
+
+                return connection.Query<User>(query).ToList();
             }
         }
 
