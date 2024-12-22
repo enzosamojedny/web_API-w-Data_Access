@@ -1,11 +1,18 @@
 ﻿namespace Models.Entities
 {
-    public class RentBooks
+    public class RentBook
     {
         public int UserId { get; set; }
         public int BookId { get; set; }
         public DateTime FechaPrestamo { get; set; }
         public DateTime FechaVencimiento { get; set; }
-        public string Status { get; set; } = "Disponible";
+        public RentBookStatus Status { get; set; } = RentBookStatus.Disponible;
+    }
+
+    public enum RentBookStatus
+    {
+        Activo,
+        Devuelto,
+        Disponible
     }
 }

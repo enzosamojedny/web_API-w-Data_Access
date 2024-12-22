@@ -1,10 +1,11 @@
-﻿namespace API.Controllers.DTOs.Response
+﻿namespace API.Controllers.DTOs
 {
-    public class BookLoanResponseDto
+    public class RentBookDTO
     {
+        public int UserId { get; set; }
         public int BookId { get; set; }
         public DateTime FechaPrestamo { get; set; }
         public DateTime FechaVencimiento { get; set; }
-        public int UserId { get; set; }
+        public string Status { get; set; }
     }
 }

@@ -2,8 +2,8 @@
 using BLL;
 using Models.Entities;
 using Microsoft.AspNetCore.Authorization;
-using API.Controllers.DTOs.Request;
 using Microsoft.Extensions.Logging;
+using API.Controllers.DTOs;
 
 namespace API.Controllers
 {

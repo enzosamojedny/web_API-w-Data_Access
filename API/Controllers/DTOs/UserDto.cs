@@ -1,4 +1,6 @@
-namespace API.Controllers.DTOs.Request
+using Models.Entities;
+
+namespace API.Controllers.DTOs
 {
     public class UserDto
     {
@@ -8,6 +10,7 @@ namespace API.Controllers.DTOs.Request
         public string Email { get; set; }
         public int DNI { get; set; }
         public bool? Deleted { get; set; } = false;
+        public Rol? Rol { get; set; }
         public string? Password { get; set; }
     }
 }

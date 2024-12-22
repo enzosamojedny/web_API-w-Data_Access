@@ -29,20 +29,26 @@ namespace DAO
                     try
                     {
                         string insertQuery = @"
-                        INSERT INTO usuarios (Nombre, Edad, Email,DNI, Password)
-                        SELECT @Nombre, @Edad, @Email, @Password
+                        INSERT INTO Users (Nombre, Edad, Email,DNI, Password, Rol)
+                        SELECT @Nombre, @Edad, @Email,@DNI, @Password, COALESCE(@Rol, 'User')
                         WHERE @Edad >= 14;
                         SELECT LAST_INSERT_ID();";
 
                         int newUserId = connection.ExecuteScalar<int>(
                             insertQuery,
-                            new { Nombre = user.Nombre, Edad = user.Edad, Email = user.Email,DNI = user.DNI, Password = user.Password },
+                            new
+                            {
+                                Nombre = user.Nombre,
+                                Edad = user.Edad,
+                                Email = user.Email,
+                                DNI = user.DNI,
+                                Password = user.Password,
+                                Rol = user.Rol
+                            },
                             transaction
                         );
 
-                        transaction.Commit(); // Commit
-
-                       
+                        transaction.Commit();
                         return GetUser(newUserId);
                     }
                     catch (MySqlException ex)
@@ -67,7 +73,7 @@ namespace DAO
             {
                 connection.Open();
 
-                return connection.Query<User>("SELECT * FROM Usuarios WHERE Deleted = 0").ToList();
+                return connection.Query<User>("SELECT * FROM Users WHERE Deleted = 0").ToList();
             }
         }
 
@@ -76,7 +82,7 @@ namespace DAO
             using var connection = new MySqlConnection(_connectionString);
             connection.Open();
 
-            var query = "SELECT ID, Nombre, Edad, Email, DNI FROM usuarios WHERE Deleted = 0";
+            var query = "SELECT ID, Nombre, Edad, Email, DNI FROM Users WHERE Deleted = 0";
             var where = new List<string>();
             var parameters = new { Id = id, Email = email, Edad = edad, DNI = dni };
 
@@ -101,7 +107,7 @@ namespace DAO
                     try
                     {
                         int rowsAffected = connection.Execute(
-                            "UPDATE usuarios SET Deleted = 1 WHERE ID = @userID",
+                            "UPDATE Users SET Deleted = 1 WHERE ID = @userID",
                             new { userID },
                             transaction
                         );
@@ -136,9 +142,9 @@ namespace DAO
                     {
                         // Update user
                         int rowsAffected = connection.Execute(
-                            @"UPDATE usuarios 
-                            SET Nombre = @Nombre, Edad = @Edad, Email = @Email, DNI = @DNI, Deleted = @Deleted 
-                            WHERE ID = @ID",
+                            @"UPDATE Users 
+                            SET Nombre = @Nombre, Edad = @Edad, Email = @Email, DNI = @DNI, Rol = @Rol, Password = @Password, Deleted = @Deleted 
+                            WHERE ID = @ID AND Deleted = FALSE""",
                             user,
                             transaction
                         );
@@ -150,7 +156,7 @@ namespace DAO
                         }
 
                         var updatedUser = connection.QuerySingleOrDefault<User>(
-                            "SELECT ID, Nombre, Edad, Email, DNI, Deleted FROM usuarios WHERE ID = @ID AND Deleted = 0",
+                            "SELECT ID, Nombre, Edad, Email, DNI, Rol, Deleted FROM Users WHERE ID = @ID AND Deleted = 0",
                             new { user.ID },
                             transaction
                         );

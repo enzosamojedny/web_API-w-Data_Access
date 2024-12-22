@@ -4,8 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using API.Controllers.DTOs.Request;
 using Microsoft.OpenApi.Any;
+using API.Controllers.DTOs;
 
 var builder = WebApplication.CreateBuilder(args);
 

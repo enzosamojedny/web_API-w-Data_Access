@@ -15,5 +15,7 @@ namespace DAO
         User UpdateUser(User user);
         User GetUser(int? id = null, string email = null, int? edad = null, int? dni = null);
         bool SoftDeleteUser(int userID);
+
+        //IEnumerable<User> GetUsers(); //???
     }
 }
