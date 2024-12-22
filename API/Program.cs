@@ -11,11 +11,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
 
-
-var jwtKey = builder.Configuration["Jwt:Key"];
-var jwtIssuer = builder.Configuration["Jwt:Issuer"];
-var jwtAudience = builder.Configuration["Jwt:Audience"];
+var jwtKey = builder.Configuration["JWT:Key"];
+var jwtIssuer = builder.Configuration["JWT:Issuer"];
+var jwtAudience = builder.Configuration["JWT:Audience"];
 
 if (string.IsNullOrEmpty(jwtKey))
     throw new ArgumentNullException(nameof(jwtKey), "JWT Key is not configured");

@@ -20,7 +20,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public ActionResult<UserDto> CreateUser([FromBody] UserDto userDto)
+        public async Task<ActionResult<UserDto>> CreateUser([FromBody] UserDto userDto)
         {
             try
             {
@@ -39,7 +39,7 @@ namespace API.Controllers
                     Password = _login.EncryptSHA256(userDto.Password)
                 };
 
-                var createdUser = _businessLayer.CreateUser(newUser);
+                var createdUser = await _businessLayer.CreateUser(newUser);
 
                 if (createdUser == null)
                 {
@@ -66,11 +66,11 @@ namespace API.Controllers
 
         [Authorize]
         [HttpGet]
-        public ActionResult<UserDto> GetUser(int? id = null, string? email = null, int? age = null, int? dni = null)
+        public async Task<ActionResult<UserDto>> GetUser(int? id = null, string? email = null, int? age = null, int? dni = null)
         {
             try
             {
-                var user = _businessLayer.GetUser(id, email, age, dni);
+                var user = await _businessLayer.GetUser(id, email, age, dni);
 
                 if (user == null)
                 {

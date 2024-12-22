@@ -24,7 +24,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public ActionResult<UserDto> CreateUser([FromBody] UserDto userDto)
+        public async Task<ActionResult<UserDto>> CreateUser([FromBody] UserDto userDto)
         {
             try
             {
@@ -44,7 +44,7 @@ namespace API.Controllers
                     Password = _login.EncryptSHA256(userDto.Password)
                 };
 
-                var createdUser = _businessLayer.CreateUser(newUser);
+                var createdUser = await _businessLayer.CreateUser(newUser);
 
                 if (createdUser == null)
                 {
@@ -72,18 +72,16 @@ namespace API.Controllers
 
         [Authorize]
         [HttpPatch]
-        public ActionResult<UserDto> UpdateUser([FromBody] UserDto userDto)
+        public async Task<ActionResult<UserDto>> UpdateUser([FromBody] UserDto userDto)
         {
             try
             {
-                var validUser = _businessLayer.GetUser(userDto.ID.Value);
-
+                var validUser = await _businessLayer.GetUser(userDto.ID.Value);//reveer esta logica
                 if (validUser == null)
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, "Invalid user data.");
                 }
 
-                // mapeo normal
                 var userToUpdate = new User
                 {
                     ID = userDto.ID,
@@ -95,14 +93,12 @@ namespace API.Controllers
                     Password = validUser.Password
                 };
 
-                var updatedUser = _businessLayer.UpdateUser(userToUpdate);
-
+                var updatedUser = await _businessLayer.UpdateUser(userToUpdate);
                 if (updatedUser == null)
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, $"Could not update user with ID {userDto.ID}.");
                 }
 
-                // mapeo a DTO
                 var updatedUserDto = new UserDto
                 {
                     ID = updatedUser.ID,
@@ -123,7 +119,7 @@ namespace API.Controllers
 
         [Authorize]
         [HttpGet]
-        public ActionResult<List<UserDto>> GetAllUsers()
+        public ActionResult<List<UserDto>> GetAllUsers() //revisar
         {
             try
             {
@@ -152,12 +148,12 @@ namespace API.Controllers
         }
         [Authorize]
         [HttpGet("search")]
-        public ActionResult<UserDto> GetUser(int? id = null, string? email = null, int? age = null, int? dni = null)
+        public async Task<ActionResult<UserDto>> GetUser(int? id = null, string? email = null, int? age = null, int? dni = null)
         {
 
             try
             {
-                var user = _businessLayer.GetUser(id, email, age, dni);
+                var user = await _businessLayer.GetUser(id, email, age, dni);
 
                 if (user == null)
                 {
@@ -187,21 +183,31 @@ namespace API.Controllers
         [Route("Login")]
         public async Task<IActionResult> Login(LoginDto login)
         {
+            //caso de que este vacio alguno de los dos campos
             if (string.IsNullOrEmpty(login.Email) || string.IsNullOrEmpty(login.Password))
             {
-                return BadRequest(new { isSuccess = false, token = "" });
+                return BadRequest(new { isSuccess = false, message = "Email and password are required" });
             }
-            var validUser =  _businessLayer.GetUser(null,login.Email);
 
-            if (validUser == null || validUser.Email == null || validUser.Password == null)
+            //busco un usuario con esos datos en la db
+            var validUser =  await _businessLayer.GetUser(null, login.Email);
+
+            //si no se encontro nada...
+            if (validUser == null)
+            {
+                return BadRequest(new { isSuccess = false, message = "Invalid credentials" });
+            }
+            string inputPassword = _login.EncryptSHA256(login.Password);
+
+            _logger.LogInformation($"hash guardado: {validUser.Password}");
+            _logger.LogInformation($"input hash: {inputPassword}");
+
+            if (validUser.Password != inputPassword)
             {
                 return BadRequest(new { isSuccess = false, token = "" });
             }
-            if (validUser.Password != login.Password)
-            {
-                return BadRequest(new { isSuccess = false, token = "" });
-            }
 
+            //genero el jwt si salio todo ok
             var token = _login.GenerateJWT(validUser);
 
             return Ok(new { isSuccess = true, token });

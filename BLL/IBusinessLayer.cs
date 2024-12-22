@@ -4,10 +4,10 @@ namespace BLL
 {
     public interface IBusinessLayer
     {
-        User CreateUser(User user);
+        Task<User> CreateUser(User user);
         List<User> GetAllUsers();
-        User UpdateUser(User user);
-        User GetUser(int? id = null, string email = null, int? edad = null, int? dni = null);
+        Task<User> UpdateUser(User user);
+        Task<User> GetUser(int? id = null, string email = null, int? edad = null, int? dni = null);
         bool SoftDeleteUser(int userID);
     }
 }

@@ -14,23 +14,23 @@ namespace BLL
             _methods = methods;
         }
 
-        public User CreateUser(User user)
+        public async Task<User> CreateUser(User user)
         {
             UserValidator.ValidateEmail(user.Email);
             UserValidator.ValidateAge(user.Edad);
             UserValidator.ValidateDNI(user.DNI.ToString());
 
-            var existingUser = GetUser(null,user.Email);
+            var existingUser = await GetUser(null,user.Email);
             if (existingUser != null)
             {
                 throw new Exception("An user with this email already exists.");
             }
 
-            return _methods.CreateUser(user);
+            return await _methods.CreateUser(user);
         }
         public List<User> GetAllUsers() => _methods.GetAllUsers();
 
-        public User GetUser(int? id = null, string? email = null, int? age = null, int? dni = null)
+        public async Task<User> GetUser(int? id = null, string? email = null, int? age = null, int? dni = null)
         {
             UserValidator.ValidateEmail(email);
             UserValidator.ValidateAge(age);
@@ -39,25 +39,20 @@ namespace BLL
             {
                 UserValidator.ValidateDNI(dni.Value.ToString());
             }
-            return _methods.GetUser(id, email, age, dni);
-        }
-
-        public User GetUserByID(int id)
-        {
-            return _methods.GetUser(id);
+            return await _methods.GetUser(id, email, age, dni);
         }
 
         public bool SoftDeleteUser(int userID)
         {
             return _methods.SoftDeleteUser(userID);
         }
-        public User UpdateUser(User user)
+        public async Task<User> UpdateUser(User user)
         {
             try
             {
                 UserValidator.ValidateAge(user.Edad);
                 UserValidator.ValidateEmail(user.Email);
-                return _methods.UpdateUser(user);
+                return await _methods.UpdateUser(user);
             }
             catch (Exception ex)
             {

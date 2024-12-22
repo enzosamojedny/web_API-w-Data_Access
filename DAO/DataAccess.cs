@@ -18,7 +18,7 @@ namespace DAO
             _connectionString = connectionString;
             _logger = logger;
         }
-        public User CreateUser(User user)
+        public async Task<User> CreateUser(User user)
         {
             using (MySqlConnection connection = new MySqlConnection(_connectionString))
             {
@@ -49,7 +49,7 @@ namespace DAO
                         );
 
                         transaction.Commit();
-                        return GetUser(newUserId);
+                        return await GetUser(newUserId);
                     }
                     catch (MySqlException ex)
                     {
@@ -77,12 +77,12 @@ namespace DAO
             }
         }
 
-        public User GetUser(int? id = null, string email = null, int? edad = null, int? dni = null)
+        public async Task<User> GetUser(int? id = null, string email = null, int? edad = null, int? dni = null)
         {
             using var connection = new MySqlConnection(_connectionString);
             connection.Open();
 
-            var query = "SELECT ID, Nombre, Edad, Email, DNI FROM Users WHERE Deleted = 0";
+            var query = "SELECT ID, Nombre, Edad, Email, DNI, Password FROM Users WHERE Deleted = 0";
             var where = new List<string>();
             var parameters = new { Id = id, Email = email, Edad = edad, DNI = dni };
 
@@ -131,7 +131,7 @@ namespace DAO
             }
         }
 
-        public User UpdateUser(User user)
+        public async Task<User> UpdateUser(User user)
         {
             using (MySqlConnection connection = new MySqlConnection(_connectionString))
             {
@@ -140,7 +140,6 @@ namespace DAO
                 {
                     try
                     {
-                        // Update user
                         int rowsAffected = connection.Execute(
                             @"UPDATE Users 
                             SET Nombre = @Nombre, Edad = @Edad, Email = @Email, DNI = @DNI, Rol = @Rol, Password = @Password, Deleted = @Deleted 
