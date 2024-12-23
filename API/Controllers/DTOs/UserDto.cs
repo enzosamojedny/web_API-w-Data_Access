@@ -10,7 +10,7 @@ namespace API.Controllers.DTOs
         public string Email { get; set; }
         public int DNI { get; set; }
         public bool? Deleted { get; set; } = false;
-        public Rol? Rol { get; set; }
+        public string Rol { get; set; }
         public string? Password { get; set; }
     }
 }

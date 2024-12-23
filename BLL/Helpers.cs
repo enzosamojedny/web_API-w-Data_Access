@@ -1,3 +1,4 @@
+using Models.Entities;
 using System.Text.RegularExpressions;
 
 namespace Helpers
@@ -34,5 +35,14 @@ namespace Helpers
                 throw new ArgumentException("DNI must contain only numbers");
             }
         }
+
+        public static void ValidateEnum(string? enumValue) 
+        {
+            if (!Enum.IsDefined(typeof(Rol), enumValue))
+            {
+                throw new ArgumentException($"Invalid role: {enumValue}");
+            }
+        }
+
     }
 }

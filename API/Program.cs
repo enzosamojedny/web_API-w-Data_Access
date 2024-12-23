@@ -57,9 +57,10 @@ builder.Services.AddSwaggerGen(c =>
         {
             ["nombre"] = new OpenApiString("John Doe"),
             ["edad"] = new OpenApiInteger(30),
-            ["email"] = new OpenApiString("john@example.com"),
+            ["email"] = new OpenApiString("john@gmail.com"),
             ["dni"] = new OpenApiInteger(38112194),
-            ["password"] = new OpenApiString("yourPassword123")
+            ["password"] = new OpenApiString("123456"),
+            ["rol"] = new OpenApiString("User")
         }
     });
 

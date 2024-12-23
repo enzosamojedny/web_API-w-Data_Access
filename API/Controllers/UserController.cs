@@ -33,6 +33,12 @@ namespace API.Controllers
                     return StatusCode(StatusCodes.Status400BadRequest, "Invalid user data.");
                 }
 
+                //parseo el string -rol- recibido al ENUM de la entity
+                if (!Enum.TryParse<Rol>(userDto.Rol, true, out var parsedRole))
+                {
+                    return BadRequest($"Invalid role. Allowed roles: {string.Join(", ", Enum.GetNames(typeof(Rol)))}");
+                }
+
                 var newUser = new User
                 {
                     ID = userDto.ID,
@@ -41,7 +47,8 @@ namespace API.Controllers
                     Email = userDto.Email,
                     DNI = userDto.DNI,
                     Deleted = userDto.Deleted ?? false,
-                    Password = _login.EncryptSHA256(userDto.Password)
+                    Password = _login.EncryptSHA256(userDto.Password),
+                    Rol = parsedRole
                 };
 
                 var createdUser = await _businessLayer.CreateUser(newUser);
@@ -59,7 +66,7 @@ namespace API.Controllers
                     Edad = createdUser.Edad,
                     Email = createdUser.Email,
                     DNI = createdUser.DNI,
-                    Deleted = createdUser.Deleted
+                    Rol = createdUser.Rol.ToString()
                 };
 
                 return CreatedAtAction(nameof(_businessLayer.GetUser), new { id = createdUser.ID }, createdUserDto);
@@ -123,6 +130,7 @@ namespace API.Controllers
         {
             try
             {
+
                 var users = await _businessLayer.GetAllUsers();
 
                 if (users == null || users.Count == 0)
@@ -138,7 +146,7 @@ namespace API.Controllers
                     Email = user.Email,
                     DNI = user.DNI,
                     Deleted = user.Deleted,
-                    Rol = user.Rol
+                    Rol = user.Rol.ToString()
                 }).ToList();
 
 
@@ -214,5 +222,28 @@ namespace API.Controllers
 
             return Ok(new { isSuccess = true, token });
         }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> SoftDeleteUser(int id)
+        {
+            try
+            {
+                var validID = await _businessLayer.GetUser(id);
+
+                bool isDeleted = _businessLayer.SoftDeleteUser(id);
+
+                if (!isDeleted)
+                {
+                    return NotFound($"User with ID {id} not found or could not be deleted.");
+                }
+
+                return Ok($"User with ID {id} has been successfully deleted.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while attempting to soft delete user with ID {id}", id);
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while deleting the user.");
+            }
+        }
+
     }
 }

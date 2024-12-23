@@ -19,7 +19,7 @@ namespace BLL
             UserValidator.ValidateEmail(user.Email);
             UserValidator.ValidateAge(user.Edad);
             UserValidator.ValidateDNI(user.DNI.ToString());
-
+            UserValidator.ValidateEnum(user.Rol.ToString()); //recheck this
             var existingUser = await GetUser(null,user.Email);
             if (existingUser != null)
             {
@@ -32,8 +32,20 @@ namespace BLL
 
         public async Task<User> GetUser(int? id = null, string? email = null, int? age = null, int? dni = null)
         {
-            UserValidator.ValidateEmail(email);
-            UserValidator.ValidateAge(age);
+            //si mando un id solo, debe aceptarlo y retornarme el usuario que pedi
+            if (id.HasValue) return await _methods.GetUser(id);
+
+            if (!string.IsNullOrEmpty(email))
+            {
+                UserValidator.ValidateEmail(email);
+                return await _methods.GetUser(null, email, null, null);
+            }
+
+            if (dni.HasValue)
+            {
+                UserValidator.ValidateDNI(dni.Value.ToString());
+                return await _methods.GetUser(null, null, null, dni);
+            }
 
             if (dni.HasValue)
             {

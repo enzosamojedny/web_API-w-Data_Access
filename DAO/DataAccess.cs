@@ -29,7 +29,7 @@ namespace DAO
                     try
                     {
                         string insertQuery = @"
-                        INSERT INTO Users (Nombre, Edad, Email,DNI, Password, Rol)
+                        INSERT INTO Users (Nombre, Edad, Email, DNI, Password, Rol)
                         SELECT @Nombre, @Edad, @Email,@DNI, @Password, COALESCE(@Rol, 'User')
                         WHERE @Edad >= 14;
                         SELECT LAST_INSERT_ID();";
@@ -73,18 +73,14 @@ namespace DAO
             {
                 connection.Open();
 
-                //return connection.Query<User>("SELECT * FROM Users WHERE Deleted = 0").ToList();
-
             const string query = @"
             SELECT 
-                ID,
                 Nombre,
                 Edad,
                 Email,
                 DNI,
                 Deleted,
-                Rol,
-                Password
+                Rol
             FROM Users 
             WHERE Deleted = 0";
 
@@ -134,13 +130,12 @@ namespace DAO
                             transaction.Commit();
                             return true;
                         }
-
                         transaction.Rollback();
                         return false;
                     }
                     catch (MySqlException ex)
                     {
-                        _logger.LogError(ex, "Error in soft delete user");
+                        _logger.LogError(ex, "Error soft deleting user");
                         transaction.Rollback();
                         return false;
                     }
