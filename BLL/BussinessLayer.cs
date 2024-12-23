@@ -19,7 +19,7 @@ namespace BLL
             UserValidator.ValidateEmail(user.Email);
             UserValidator.ValidateAge(user.Edad);
             UserValidator.ValidateDNI(user.DNI.ToString());
-            UserValidator.ValidateEnum(user.Rol.ToString()); //recheck this
+            UserValidator.ValidateEnum(user.Rol.ToString());
             var existingUser = await GetUser(null,user.Email);
             if (existingUser != null)
             {

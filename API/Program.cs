@@ -18,13 +18,6 @@ var jwtKey = builder.Configuration["JWT:Key"];
 var jwtIssuer = builder.Configuration["JWT:Issuer"];
 var jwtAudience = builder.Configuration["JWT:Audience"];
 
-if (string.IsNullOrEmpty(jwtKey))
-    throw new ArgumentNullException(nameof(jwtKey), "JWT Key is not configured");
-if (string.IsNullOrEmpty(jwtIssuer))
-    throw new ArgumentNullException(nameof(jwtIssuer), "JWT Issuer is not configured");
-if (string.IsNullOrEmpty(jwtAudience))
-    throw new ArgumentNullException(nameof(jwtAudience), "JWT Audience is not configured");
-
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

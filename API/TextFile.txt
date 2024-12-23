@@ -23,7 +23,7 @@ crear una API con siguientes endpoints:
 -registro de usuario, que guarde el usuario con la contraseña hasheada,								----DONE
 -login de usuario, que valida pass y contraseña y 
 devuelve un token JWT junto con la informaicon del usuario (en un objeto)							----DONE
--endpoint para obtener la informacion de un usuario cualquiera, obtenido por atributo,				----????
+-endpoint para obtener la informacion de un usuario cualquiera, obtenido por atributo,				----DONE
 este endpoint solo debe poder ser llamado por un usuario logueado.
 
 3-

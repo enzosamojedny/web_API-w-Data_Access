@@ -30,7 +30,7 @@ namespace DAO
                     {
                         string insertQuery = @"
                         INSERT INTO Users (Nombre, Edad, Email, DNI, Password, Rol)
-                        SELECT @Nombre, @Edad, @Email,@DNI, @Password, COALESCE(@Rol, 'User')
+                        SELECT @Nombre, @Edad, @Email,@DNI, @Password, @Rol
                         WHERE @Edad >= 14;
                         SELECT LAST_INSERT_ID();";
 
@@ -43,7 +43,7 @@ namespace DAO
                                 Email = user.Email,
                                 DNI = user.DNI,
                                 Password = user.Password,
-                                Rol = user.Rol
+                                Rol = user.Rol.ToString()
                             },
                             transaction
                         );
@@ -84,8 +84,6 @@ namespace DAO
             FROM Users 
             WHERE Deleted = 0";
 
-            //solucionar problema con mapping de string a enum
-
                 return connection.Query<User>(query).ToList();
             }
         }
@@ -95,7 +93,7 @@ namespace DAO
             using var connection = new MySqlConnection(_connectionString);
             connection.Open();
 
-            var query = "SELECT ID, Nombre, Edad, Email, DNI, Password FROM Users WHERE Deleted = 0";
+            var query = "SELECT ID, Nombre, Edad, Email, DNI, Password, Rol FROM Users WHERE Deleted = 0";
             var where = new List<string>();
             var parameters = new { Id = id, Email = email, Edad = edad, DNI = dni };
 
@@ -152,11 +150,23 @@ namespace DAO
                 {
                     try
                     {
+                        var parameters = new
+                        {
+                            user.ID,
+                            user.Nombre,
+                            user.Edad,
+                            user.Email,
+                            user.DNI,
+                            Rol = user.Rol.ToString(),
+                            user.Password,
+                            user.Deleted
+                        };
+
                         int rowsAffected = connection.Execute(
                             @"UPDATE Users 
-                            SET Nombre = @Nombre, Edad = @Edad, Email = @Email, DNI = @DNI, Rol = @Rol, Password = @Password, Deleted = @Deleted 
-                            WHERE ID = @ID AND Deleted = FALSE""",
-                            user,
+                      SET Nombre = @Nombre, Edad = @Edad, Email = @Email, DNI = @DNI, Rol = @Rol, Password = @Password, Deleted = @Deleted 
+                      WHERE ID = @ID AND Deleted = FALSE",
+                            parameters,
                             transaction
                         );
 

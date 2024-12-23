@@ -2,7 +2,6 @@
 using BLL;
 using Models.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
 using API.Controllers.DTOs;
 
 namespace API.Controllers
@@ -83,10 +82,15 @@ namespace API.Controllers
         {
             try
             {
-                var validUser = await _businessLayer.GetUser(userDto.ID.Value);//reveer esta logica
+                var validUser = await _businessLayer.GetUser(userDto.ID.Value);
                 if (validUser == null)
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, "Invalid user data.");
+                }
+
+                if (!Enum.TryParse<Rol>(userDto.Rol, true, out var parsedRole))
+                {
+                    return BadRequest($"Invalid role. Allowed roles: {string.Join(", ", Enum.GetNames(typeof(Rol)))}");
                 }
 
                 var userToUpdate = new User
@@ -97,7 +101,8 @@ namespace API.Controllers
                     Email = userDto.Email,
                     DNI = userDto.DNI,
                     Deleted = userDto.Deleted ?? validUser.Deleted,
-                    Password = validUser.Password
+                    Password = validUser.Password,
+                    Rol = parsedRole
                 };
 
                 var updatedUser = await _businessLayer.UpdateUser(userToUpdate);
@@ -113,7 +118,8 @@ namespace API.Controllers
                     Edad = updatedUser.Edad,
                     Email = updatedUser.Email,
                     DNI = updatedUser.DNI,
-                    Deleted = updatedUser.Deleted
+                    Deleted = updatedUser.Deleted,
+                    Rol = updatedUser.Rol.ToString()
                 };
 
                 return StatusCode(StatusCodes.Status200OK, updatedUserDto);

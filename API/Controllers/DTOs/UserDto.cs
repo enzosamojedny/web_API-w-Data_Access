@@ -1,5 +1,3 @@
-using Models.Entities;
-
 namespace API.Controllers.DTOs
 {
     public class UserDto
