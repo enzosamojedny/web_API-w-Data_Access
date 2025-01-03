@@ -20,6 +20,7 @@ namespace BLL
             UserValidator.ValidateAge(user.Edad);
             UserValidator.ValidateDNI(user.DNI.ToString());
             UserValidator.ValidateEnum(user.Rol.ToString());
+
             var existingUser = await GetUser(null,user.Email);
             if (existingUser != null)
             {
@@ -70,6 +71,59 @@ namespace BLL
             {
                 throw new Exception(ex.Message);
             }
+        }
+        //agregar validaciones
+        public async Task<Book> CreateBook(Book book)
+        {
+            if (string.IsNullOrWhiteSpace(book.Titulo))
+            {
+                throw new ArgumentException("The title of the book cannot be empty.");
+            }
+
+            if (book.FechaPublicacion != null && book.FechaPublicacion > DateTime.UtcNow)
+            {
+                throw new ArgumentException("The publication date cannot be in the future.");
+            }
+
+            var createdBook = await _methods.CreateBook(book);
+
+            if (createdBook == null)
+            {
+                throw new InvalidOperationException("Unable to create the book.");
+            }
+
+            return createdBook;
+        }
+        public async Task<IEnumerable<Book>> GetBooks(int? id = null, string? titulo = null, string? autor = null)
+        {
+            if (id.HasValue)
+                return await _methods.GetBooks(id);
+
+            if (!string.IsNullOrEmpty(titulo))
+            {
+                return await _methods.GetBooks(null, titulo, null);
+            }
+
+            if (!string.IsNullOrEmpty(autor))
+            {
+                return await _methods.GetBooks(null, null, autor);
+            }
+
+            return await _methods.GetBooks(id, titulo, autor);
+        }
+
+        public async Task<Book> RentBook(string email, int bookId)
+        {
+
+            var rentBook = new RentBook
+            {
+                BookId = bookId,
+                FechaPrestamo = DateTime.UtcNow,
+                FechaVencimiento = DateTime.UtcNow.AddDays(5),
+                Status = RentBookStatus.Activo
+            };
+
+            return await _methods.RentBook(email, bookId);
         }
     }
 }

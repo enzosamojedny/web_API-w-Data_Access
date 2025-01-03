@@ -8,11 +8,4 @@
         public DateTime FechaVencimiento { get; set; }
         public RentBookStatus Status { get; set; } = RentBookStatus.Disponible;
     }
-
-    public enum RentBookStatus
-    {
-        Activo,
-        Devuelto,
-        Disponible
-    }
 }

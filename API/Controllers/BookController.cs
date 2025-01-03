@@ -3,6 +3,7 @@ using BLL;
 using Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using API.Controllers.DTOs;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace API.Controllers
 {
@@ -11,85 +12,92 @@ namespace API.Controllers
     public class BookController : ControllerBase
     {
         private readonly IBusinessLayer _businessLayer;
-        private readonly Login _login;
+        private readonly ILogger<BookController> _logger;
 
-        public BookController(IBusinessLayer businessLayer, Login login)
+        public BookController(IBusinessLayer businessLayer, ILogger<BookController> logger)
         {
             _businessLayer = businessLayer;
-            _login = login;
+            _logger = logger;
         }
-
+        [Authorize]
         [HttpPost]
-        public async Task<ActionResult<UserDto>> CreateUser([FromBody] UserDto userDto)
+        public async Task<ActionResult<BookDto>> CreateBook([FromBody] BookDto bookDto)
         {
+            _logger.LogInformation("CreateBook called with title: {Title}", bookDto?.Titulo);
+
             try
             {
-                if (userDto == null)
+                if (bookDto == null)
                 {
-                    return StatusCode(StatusCodes.Status400BadRequest, "Invalid user data.");
+                    _logger.LogWarning("CreateBook received null BookDto.");
+                    return StatusCode(StatusCodes.Status400BadRequest, "Invalid book data.");
                 }
 
-                var newUser = new User
+                var newBook = new Book
                 {
-                    ID = userDto.ID,
-                    Nombre = userDto.Nombre,
-                    Edad = userDto.Edad,
-                    Email = userDto.Email,
-                    Deleted = userDto.Deleted ?? false,
-                    Password = _login.EncryptSHA256(userDto.Password)
+                    Titulo = bookDto.Titulo,
+                    Autor = bookDto.Autor,
+                    Descripcion = bookDto.Descripcion,
+                    FechaPublicacion = bookDto.FechaPublicacion
                 };
 
-                var createdUser = await _businessLayer.CreateUser(newUser);
+                _logger.LogDebug("Attempting to create book: {@NewBook}", newBook);
+                var createdBook = await _businessLayer.CreateBook(newBook);
 
-                if (createdUser == null)
+                if (createdBook == null)
                 {
-                    return StatusCode(StatusCodes.Status400BadRequest, $"Could not create user {userDto.Nombre}.");
+                    _logger.LogError("Failed to create book: {Title}", bookDto.Titulo);
+                    return StatusCode(StatusCodes.Status400BadRequest, $"Could not create book {bookDto.Titulo}.");
                 }
 
-                // eliminada info sensible en el mapeo a DTO
-                var createdUserDto = new UserDto
+                var createdBookDto = new BookDto
                 {
-                    ID = createdUser.ID,
-                    Nombre = createdUser.Nombre,
-                    Edad = createdUser.Edad,
-                    Email = createdUser.Email,
-                    Deleted = createdUser.Deleted
+                    Titulo = createdBook.Titulo,
+                    Autor = createdBook.Autor,
+                    Descripcion = createdBook.Descripcion,
+                    FechaPublicacion = createdBook.FechaPublicacion
                 };
 
-                return CreatedAtAction(nameof(_businessLayer.GetUser), new { id = createdUser.ID }, createdUserDto);
+                _logger.LogInformation("Book created successfully: {Title}", createdBookDto.Titulo);
+                return CreatedAtAction(nameof(GetBooks), new { id = createdBook.ID }, createdBookDto);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while creating a book.");
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
             }
         }
 
         [Authorize]
         [HttpGet]
-        public async Task<ActionResult<UserDto>> GetUser(int? id = null, string? email = null, int? age = null, int? dni = null)
+        public async Task<ActionResult<IEnumerable<BookDto>>> GetBooks(int? id = null, string? titulo = null, string? autor = null)
         {
             try
             {
-                var user = await _businessLayer.GetUser(id, email, age, dni);
+                var books = await _businessLayer.GetBooks(id, titulo, autor);
 
-                if (user == null)
+                if (books == null)
                 {
-                    return NotFound("User not found.");
+                    _logger.LogWarning("No book found for the given criteria. ID: {Id}, Title: {Title}, Author: {Author}", id, titulo, autor);
+                    return NotFound("Book not found.");
                 }
+                var bookDtos = new List<BookDto>();
 
-                var userDto = new UserDto
+                foreach (var book in books)
                 {
-                    ID = user.ID,
-                    Nombre = user.Nombre,
-                    Edad = user.Edad,
-                    Email = user.Email,
-                    DNI = user.DNI,
-                    Deleted = user.Deleted
-                };
-                return Ok(userDto);
+                    bookDtos.Add(new BookDto
+                    {
+                        Titulo = book.Titulo,
+                        Autor = book.Autor,
+                        Descripcion = book.Descripcion,
+                        FechaPublicacion = book.FechaPublicacion
+                    });
+                }
+                return Ok(bookDtos);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while retrieving a book.");
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
             }
         }

@@ -78,5 +78,21 @@ namespace BLL
             );
             return new JwtSecurityTokenHandler().WriteToken(jwtConfig);
         }
+
+        //saco el email del jwt
+        public string DecodeJWT(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+
+            var emailClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Email);
+
+            if (emailClaim == null)
+            {
+                throw new InvalidOperationException("Email claim not found in the token.");
+            }
+
+            return emailClaim.Value;
+        }
     }
 }

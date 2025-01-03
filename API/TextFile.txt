@@ -29,16 +29,16 @@ este endpoint solo debe poder ser llamado por un usuario logueado.
 3-
 -> agregar al ejercicio de la clase pasada:
 
--un endpoint para que un usuario pueda pedir un libro												----????
--se debe ingresar a este endpoint una hora/fecha en la que se le da al usuario el libro,			----????
-un nombre del libro y un id del usuario al que se le esta prestando el libro						----????
--el endpoint debe dar una fecha de vencimiento del alquiler del libro,								----????
+-un endpoint para que un usuario pueda pedir un libro												----DONE
+-se debe ingresar a este endpoint una hora/fecha en la que se le da al usuario el libro,			----DONE
+un nombre del libro y un id del usuario al que se le esta prestando el libro						
+-el endpoint debe dar una fecha de vencimiento del alquiler del libro,								----DONE
 que sera 5 días después de la fecha de préstamo
--el endpoint debe recibir un token de usuario con un id												----????
--el endpoint debe revisar que el usuario que esta pidiendo el libro,								----????
+-el endpoint debe recibir un token de usuario con un id												----DONE
+-el endpoint debe revisar que el usuario que esta pidiendo el libro,								----DONE
 y el usuario al que se esta dando el préstamo sean el mismo
--el endpoint solo debe poder ser accedido por el rol “usuario”										----????
--modificar la creación del jwt para que obtenga los datos desde configuración						----????
+-el endpoint solo debe poder ser accedido por el rol “usuario”										----DONE
+-modificar la creación del jwt para que obtenga los datos desde configuración						----DONE
 (tanto en el program.cs como en el controlador)
--modificar la conexión a la bd para que obtenga el connectionstring desde configuración				----????
--aplicar inyección de dependencias al obtener el DAO												----????
+-modificar la conexión a la bd para que obtenga el connectionstring desde configuración				----DONE
+-aplicar inyección de dependencias al obtener el DAO												----DONE

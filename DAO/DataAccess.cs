@@ -2,7 +2,7 @@
 using MySqlConnector;
 using Microsoft.Extensions.Logging;
 using Models.Entities;
-using System.Text;
+
 
 namespace DAO
 {
@@ -12,7 +12,7 @@ namespace DAO
 
         private readonly string _connectionString;
         private readonly ILogger _logger;
-            
+
         public DataAccess(string connectionString, ILogger logger)
         {
             _connectionString = connectionString;
@@ -73,7 +73,7 @@ namespace DAO
             {
                 connection.Open();
 
-            const string query = @"
+                const string query = @"
             SELECT 
                 Nombre,
                 Edad,
@@ -195,5 +195,142 @@ namespace DAO
             }
         }
 
+        public async Task<Book> CreateBook(Book book)
+        {
+            using (var connection = new MySqlConnection(_connectionString))
+            {
+                connection.Open();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        var query = @"INSERT INTO Books (Titulo, Autor, Descripcion, FechaPublicacion, UserId) 
+                              VALUES (@Titulo, @Autor, @Descripcion, @FechaPublicacion, @UserId);
+                              SELECT LAST_INSERT_ID();";
+
+                        var newId = await connection.ExecuteScalarAsync<int>(query, book, transaction);
+                        book.ID = newId;
+
+                        transaction.Commit();
+                        return book;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        _logger.LogError(ex, "Error creating book");
+                        throw;
+                    }
+                }
+            }
+        }
+
+        public async Task<IEnumerable<Book>> GetBooks(int? id = null, string? titulo = null, string? autor = null)
+        {
+            using (var connection = new MySqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                var query = "SELECT ID, Titulo, Autor, Descripcion, FechaPublicacion, UserId FROM Books";
+                var where = new List<string>();
+                var parameters = new DynamicParameters();
+
+                if (id.HasValue)
+                {
+                    where.Add("ID = @Id");
+                    parameters.Add("Id", id);
+                }
+                if (!string.IsNullOrEmpty(titulo))
+                {
+                    where.Add("Titulo = @Titulo");
+                    parameters.Add("Titulo", titulo);
+                }
+                if (!string.IsNullOrEmpty(autor))
+                {
+                    where.Add("Autor = @Autor");
+                    parameters.Add("Autor", autor);
+                }
+
+                if (where.Any())
+                    query += " WHERE " + string.Join(" AND ", where);
+                return await connection.QueryAsync<Book>(query, parameters);
+            }
+        }
+
+        public async Task<Book> RentBook(string email, int bookId)
+        {
+            using var connection = new MySqlConnection(_connectionString);
+            connection.Open();
+
+            using var transaction = connection.BeginTransaction();
+            {
+                var userExists = await GetUser(null, email);
+                try
+                {
+                    //existe el usuario?
+
+
+                    if (userExists == null)
+                    {
+                        throw new InvalidOperationException("User does not exist.");
+                    }
+
+                    //el libro esta disponible para alquilar?
+                    var isAvailable = await connection.ExecuteScalarAsync<bool>(
+                        @"SELECT COUNT(*) > 0 
+                        FROM RentBooks 
+                        WHERE BookId = @BookId AND Status = @Status FOR UPDATE;",
+                        //for update me lockea la transaccion, para que no se guarde si sale mal
+                        new { BookId = bookId, Status = RentBookStatus.Disponible },
+                        transaction);
+
+                    if (!isAvailable)
+                    {
+                        throw new InvalidOperationException("Book is not available for rent.");
+                    }
+
+                    //si esta disponible, lo alquilo
+                    var rentQuery = @"INSERT INTO RentBooks (UserId, BookId, FechaPrestamo, FechaVencimiento, Status) 
+                              VALUES (@UserId, @BookId, @FechaPrestamo, @FechaVencimiento, @Status)";
+
+                    var rent = new
+                    {
+                        UserId = userExists.ID,
+                        BookId = bookId,
+                        FechaPrestamo = DateTime.UtcNow,
+                        FechaVencimiento = DateTime.UtcNow.AddDays(5),
+                        Status = RentBookStatus.Activo
+                    };
+
+                    await connection.ExecuteAsync(rentQuery, rent, transaction);
+
+                    // actualizo el userId de books para mostrar que esta alquilado
+                    await connection.ExecuteAsync(
+                        "UPDATE Books SET UserId = @UserId WHERE ID = @BookId",
+                        new { UserId = userExists.ID, BookId = bookId },
+                        transaction);
+
+                    transaction.Commit();
+
+                    //devuelvo el libro alquilado como response
+                    var bookQuery = @"SELECT ID, Titulo, Autor, Descripcion, FechaPublicacion, UserId 
+                              FROM Books 
+                              WHERE ID = @BookId";
+
+                    var rentedBook = await connection.QuerySingleOrDefaultAsync<Book>(bookQuery, new { BookId = bookId });
+
+                    if (rentedBook == null)
+                    {
+                        throw new InvalidOperationException("Failed to retrieve rented book details.");
+                    }
+                    return rentedBook;
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    _logger.LogError(ex, "Error renting book for UserId: {UserId}, BookId: {BookId}", userExists.ID, bookId);
+                    throw;
+                }
+            }
+        }
     }
 }
